@@ -1,7 +1,15 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
+import 'package:privex/utils.dart';
 
-void main() {
+void main() async {
+  await setup();
   runApp(const MyApp());
+}
+
+Future<void> setup() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await setupFirebase();
 }
 
 class MyApp extends StatelessWidget {
@@ -30,7 +38,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'Test'),
     );
   }
 }
