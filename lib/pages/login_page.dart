@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:privex/const.dart';
+import 'package:privex/services/auth_service.dart';
+import 'package:privex/services/navigation_services.dart';
 import 'package:privex/widgets/custom_form_field.dart';
 
 class LoginPage extends StatefulWidget {
@@ -9,6 +13,21 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final GlobalKey<FormState> _loginFormKey = GlobalKey();
+  final GetIt _getIt = GetIt.instance;
+
+  late AuthService _authService;
+  late NavigationalServices _navigationServices;
+
+  String? email, password;
+
+  @override
+  void initState() {
+    super.initState();
+    _authService = _getIt.get<AuthService>();
+    _navigationServices = _getIt.get<NavigationalServices>();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(body: _buildUI(), resizeToAvoidBottomInset: false);
@@ -59,6 +78,7 @@ class _LoginPageState extends State<LoginPage> {
         vertical: MediaQuery.sizeOf(context).height * 0.05,
       ),
       child: Form(
+        key: _loginFormKey,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           mainAxisSize: MainAxisSize.max,
@@ -67,10 +87,23 @@ class _LoginPageState extends State<LoginPage> {
             CustomFormField(
               height: MediaQuery.sizeOf(context).height * 0.1,
               hintText: "Email",
+              validationRegExp: EMAIL_VALIDATION_REGEX,
+              onSaved: (value) {
+                setState(() {
+                  email = value;
+                });
+              },
             ),
             CustomFormField(
               height: MediaQuery.sizeOf(context).height * 0.1,
               hintText: "Password",
+              validationRegExp: PASSWORD_VALIDATION_REGEX,
+              obscureText: true,
+              onSaved: (value) {
+                setState(() {
+                  password = value;
+                });
+              },
             ),
             _loginButton(),
           ],
@@ -83,7 +116,15 @@ class _LoginPageState extends State<LoginPage> {
     return SizedBox(
       width: MediaQuery.sizeOf(context).width,
       child: MaterialButton(
-        onPressed: () {},
+        onPressed: () async {
+          if (_loginFormKey.currentState?.validate() ?? false) {
+            _loginFormKey.currentState?.save();
+            bool result = await _authService.login(email!, password!);
+            if (result) {
+              _navigationServices.pushReplacementNamed("/home");
+            } else {}
+          }
+        },
         color: Theme.of(context).colorScheme.primary,
         child: const Text('Login', style: TextStyle(color: Colors.white)),
       ),

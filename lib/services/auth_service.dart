@@ -6,7 +6,7 @@ class AuthService {
   User? get user {
     return _user;
   }
-  AuthService() {}
+  AuthService();
 
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
