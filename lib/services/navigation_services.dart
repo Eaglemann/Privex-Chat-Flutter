@@ -1,12 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:privex/pages/home_page.dart';
 import 'package:privex/pages/login_page.dart';
+import 'package:privex/pages/register_page.dart';
 
 class NavigationalServices {
   late GlobalKey<NavigatorState> _navigatorKey;
 
   final Map<String, Widget Function(BuildContext)> _routes = {
     "/login": (context) => LoginPage(),
+    "/register": (context) => RegisterPage(),
     "/home": (context) => HomePage(),
   };
 

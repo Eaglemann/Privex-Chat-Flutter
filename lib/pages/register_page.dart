@@ -1,39 +1,38 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:privex/const.dart';
-import 'package:privex/services/alert_services.dart';
-import 'package:privex/services/auth_service.dart';
+import 'package:privex/services/media_service.dart';
 import 'package:privex/services/navigation_services.dart';
 import 'package:privex/widgets/custom_form_field.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
-  final GlobalKey<FormState> _loginFormKey = GlobalKey();
+class _RegisterPageState extends State<RegisterPage> {
+  File? selectedImage;
   final GetIt _getIt = GetIt.instance;
 
-  late AuthService _authService;
+  late MediaService _mediaService;
   late NavigationalServices _navigationServices;
-  late AlertServices _alertServices;
 
-  String? email, password;
+  String? name, email, password;
 
   @override
   void initState() {
     super.initState();
-    _authService = _getIt.get<AuthService>();
+    _mediaService = _getIt.get<MediaService>();
     _navigationServices = _getIt.get<NavigationalServices>();
-    _alertServices = _getIt.get<AlertServices>();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: _buildUI(), resizeToAvoidBottomInset: false);
+    return Scaffold(resizeToAvoidBottomInset: false, body: _buildUI());
   }
 
   Widget _buildUI() {
@@ -41,7 +40,7 @@ class _LoginPageState extends State<LoginPage> {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 20.0),
         child: Column(
-          children: [_headerText(), _LoginForm(), _createAccountLink()],
+          children: [_headerText(), _registerForm(), _loginAccountLink()],
         ),
       ),
     );
@@ -57,11 +56,11 @@ class _LoginPageState extends State<LoginPage> {
 
         children: [
           Text(
-            'Hi, Welcome Back!',
+            'Let\'s Get Started!',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
           ),
           Text(
-            'You have been missed!',
+            'Register a new account',
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w500,
@@ -73,23 +72,32 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  // ignore: non_constant_identifier_names
-  Widget _LoginForm() {
+  Widget _registerForm() {
     return Container(
-      height: MediaQuery.sizeOf(context).height * 0.4,
+      height: MediaQuery.sizeOf(context).height * 0.6,
       margin: EdgeInsets.symmetric(
         vertical: MediaQuery.sizeOf(context).height * 0.05,
       ),
       child: Form(
-        key: _loginFormKey,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            _pfpSelectionField(),
             CustomFormField(
+              hintText: "Name",
               height: MediaQuery.sizeOf(context).height * 0.1,
+              validationRegExp: NAME_VALIDATION_REGEX,
+              onSaved: (value) {
+                setState(() {
+                  name = value;
+                });
+              },
+            ),
+            CustomFormField(
               hintText: "Email",
+              height: MediaQuery.sizeOf(context).height * 0.1,
               validationRegExp: EMAIL_VALIDATION_REGEX,
               onSaved: (value) {
                 setState(() {
@@ -98,61 +106,67 @@ class _LoginPageState extends State<LoginPage> {
               },
             ),
             CustomFormField(
-              height: MediaQuery.sizeOf(context).height * 0.1,
               hintText: "Password",
+              height: MediaQuery.sizeOf(context).height * 0.1,
               validationRegExp: PASSWORD_VALIDATION_REGEX,
-              obscureText: true,
               onSaved: (value) {
                 setState(() {
                   password = value;
                 });
               },
             ),
-            _loginButton(),
+            _registerButton(),
           ],
         ),
       ),
     );
   }
 
-  Widget _loginButton() {
-    return SizedBox(
-      width: MediaQuery.sizeOf(context).width,
-      child: MaterialButton(
-        onPressed: () async {
-          if (_loginFormKey.currentState?.validate() ?? false) {
-            _loginFormKey.currentState?.save();
-            bool result = await _authService.login(email!, password!);
-            if (result) {
-              _navigationServices.pushReplacementNamed("/home");
-            } else {
-              _alertServices.showToast(
-                text: "Invalid email or password",
-                icon: Icons.error,
-              );
-            }
-          }
-        },
-        color: Theme.of(context).colorScheme.primary,
-        child: const Text('Login', style: TextStyle(color: Colors.white)),
+  Widget _pfpSelectionField() {
+    return GestureDetector(
+      onTap: () async {
+        File? file = await _mediaService.getImageFromGallery();
+        if (file != null) {
+          setState(() {
+            selectedImage = file;
+          });
+        }
+      },
+      child: CircleAvatar(
+        radius: MediaQuery.of(context).size.width * 0.15,
+        backgroundImage:
+            selectedImage != null
+                ? FileImage(selectedImage!)
+                : NetworkImage(PLACEHOLDER_PFP) as ImageProvider,
       ),
     );
   }
 
-  Widget _createAccountLink() {
+  Widget _registerButton() {
+    return SizedBox(
+      width: MediaQuery.sizeOf(context).width,
+      child: MaterialButton(
+        color: Theme.of(context).colorScheme.primary,
+        onPressed: () {},
+        child: const Text('Register', style: TextStyle(color: Colors.white)),
+      ),
+    );
+  }
+
+  Widget _loginAccountLink() {
     return Expanded(
       child: Row(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          const Text("Dont have and account yet?"),
+          const Text("Already have an account? "),
           GestureDetector(
             onTap: () {
-              _navigationServices.pushNamed("/register");
+              _navigationServices.goBack();
             },
             child: const Text(
-              "Sign Up!",
+              "Log In!",
               style: TextStyle(fontWeight: FontWeight.w800),
             ),
           ),
