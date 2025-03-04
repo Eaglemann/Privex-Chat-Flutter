@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:get_it/get_it.dart';
 import 'package:privex/firebase_options.dart';
+import 'package:privex/services/alert_services.dart';
 import 'package:privex/services/auth_service.dart';
 import 'package:privex/services/navigation_services.dart';
 
@@ -13,4 +14,5 @@ Future<void> registerServices() async {
   final GetIt getIt = GetIt.instance;
   getIt.registerSingleton<AuthService>(AuthService());
   getIt.registerSingleton<NavigationalServices>(NavigationalServices());
+  getIt.registerSingleton<AlertServices>(AlertServices());
 }
