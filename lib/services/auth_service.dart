@@ -24,7 +24,7 @@ class AuthService {
         return true;
       }
     } catch (e) {
-      rethrow;
+      print(e);
     }
     return false;
   }
@@ -34,6 +34,7 @@ class AuthService {
       await _firebaseAuth.signOut();
       return true;
     } catch (e) {
+      // ignore: avoid_print
       print(e);
     }
     return false;

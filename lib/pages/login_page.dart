@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:privex/const.dart';
+import 'package:privex/services/alert_services.dart';
 import 'package:privex/services/auth_service.dart';
 import 'package:privex/services/navigation_services.dart';
 import 'package:privex/widgets/custom_form_field.dart';
@@ -18,6 +19,7 @@ class _LoginPageState extends State<LoginPage> {
 
   late AuthService _authService;
   late NavigationalServices _navigationServices;
+  late AlertServices _alertServices;
 
   String? email, password;
 
@@ -26,6 +28,7 @@ class _LoginPageState extends State<LoginPage> {
     super.initState();
     _authService = _getIt.get<AuthService>();
     _navigationServices = _getIt.get<NavigationalServices>();
+    _alertServices = _getIt.get<AlertServices>();
   }
 
   @override
@@ -122,7 +125,12 @@ class _LoginPageState extends State<LoginPage> {
             bool result = await _authService.login(email!, password!);
             if (result) {
               _navigationServices.pushReplacementNamed("/home");
-            } else {}
+            } else {
+              _alertServices.showToast(
+                text: "Invalid email or password",
+                icon: Icons.error,
+              );
+            }
           }
         },
         color: Theme.of(context).colorScheme.primary,
