@@ -6,7 +6,10 @@ class AuthService {
   User? get user {
     return _user;
   }
-  AuthService();
+
+  AuthService() {
+    _firebaseAuth.authStateChanges().listen(authStateChangesStreamListener);
+  }
 
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
@@ -24,5 +27,9 @@ class AuthService {
       rethrow;
     }
     return false;
+  }
+
+  void authStateChangesStreamListener(User? user) {
+    _user = user;
   }
 }
