@@ -179,21 +179,29 @@ class _RegisterPageState extends State<RegisterPage> {
               _registerFormKey.currentState!.save();
               bool result = await _authService.signup(email!, password!);
 
-              if (result) {}
-              await _databaseService.createUserProfile(
-                userProfile: UserProfile(
-                  uid: _authService.user!.uid,
-                  name: name,
-                ),
-              );
-              _alertServices.showToast(
-                text: "User Registration Successful!",
-                icon: Icons.check,
-              );
+              if (result) {
+                await _databaseService.createUserProfile(
+                  userProfile: UserProfile(
+                    uid: _authService.user!.uid,
+                    name: name,
+                  ),
+                );
+                _alertServices.showToast(
+                  text: "User Registration Successful!",
+                  icon: Icons.check,
+                );
+                _navigationServices.pushReplacementNamed("/home");
+              } else {
+                throw Exception("Unable to register!");
+              }
             }
           } catch (e) {
             // ignore: avoid_print
             print(e);
+            _alertServices.showToast(
+              text: "Failed to register, please try again!",
+              icon: Icons.error,
+            );
           }
           setState(() {
             isLoading = false;
