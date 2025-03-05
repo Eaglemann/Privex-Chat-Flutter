@@ -28,7 +28,7 @@ class AlertServices {
             ),
           );
         },
-      ).show(_navigationServices.navigatorKey!.currentContext!);
+      ).show(_navigationServices.navigatorKey.currentContext!);
     } catch (e) {
       // ignore: avoid_print
       print(e);

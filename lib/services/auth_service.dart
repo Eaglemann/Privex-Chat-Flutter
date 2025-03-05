@@ -24,6 +24,24 @@ class AuthService {
         return true;
       }
     } catch (e) {
+      // ignore: avoid_print
+      print(e);
+    }
+    return false;
+  }
+
+  Future<bool> signup(String email, String password) async {
+    try {
+      final credential = await _firebaseAuth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      if (credential.user != null) {
+        _user = credential.user;
+      }
+      return true;
+    } catch (e) {
+      // ignore: avoid_print
       print(e);
     }
     return false;

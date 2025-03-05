@@ -3,6 +3,8 @@ import 'package:get_it/get_it.dart';
 import 'package:privex/firebase_options.dart';
 import 'package:privex/services/alert_services.dart';
 import 'package:privex/services/auth_service.dart';
+import 'package:privex/services/database_services.dart';
+import 'package:privex/services/media_service.dart';
 import 'package:privex/services/navigation_services.dart';
 
 Future<void> setupFirebase() async {
@@ -15,4 +17,6 @@ Future<void> registerServices() async {
   getIt.registerSingleton<AuthService>(AuthService());
   getIt.registerSingleton<NavigationalServices>(NavigationalServices());
   getIt.registerSingleton<AlertServices>(AlertServices());
+  getIt.registerSingleton<MediaService>(MediaService());
+  getIt.registerSingleton<DatabaseService>(DatabaseService());
 }
