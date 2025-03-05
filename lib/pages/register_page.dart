@@ -3,7 +3,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:privex/const.dart';
+import 'package:privex/models/user_profile.dart';
+import 'package:privex/services/alert_services.dart';
 import 'package:privex/services/auth_service.dart';
+import 'package:privex/services/database_services.dart';
 import 'package:privex/services/media_service.dart';
 import 'package:privex/services/navigation_services.dart';
 import 'package:privex/widgets/custom_form_field.dart';
@@ -24,6 +27,8 @@ class _RegisterPageState extends State<RegisterPage> {
   late MediaService _mediaService;
   late NavigationalServices _navigationServices;
   late AuthService _authService;
+  late DatabaseService _databaseService;
+  late AlertServices _alertServices;
 
   String? name, email, password;
 
@@ -35,6 +40,8 @@ class _RegisterPageState extends State<RegisterPage> {
     _mediaService = _getIt.get<MediaService>();
     _navigationServices = _getIt.get<NavigationalServices>();
     _authService = _getIt.get<AuthService>();
+    _databaseService = _getIt.get<DatabaseService>();
+    _alertServices = _getIt.get<AlertServices>();
   }
 
   @override
@@ -173,7 +180,16 @@ class _RegisterPageState extends State<RegisterPage> {
               bool result = await _authService.signup(email!, password!);
 
               if (result) {}
-              print(result);
+              await _databaseService.createUserProfile(
+                userProfile: UserProfile(
+                  uid: _authService.user!.uid,
+                  name: name,
+                ),
+              );
+              _alertServices.showToast(
+                text: "User Registration Successful!",
+                icon: Icons.check,
+              );
             }
           } catch (e) {
             // ignore: avoid_print
