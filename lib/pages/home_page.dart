@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:privex/models/user_profile.dart';
+import 'package:privex/pages/chat_page.dart';
 import 'package:privex/services/alert_services.dart';
 import 'package:privex/services/auth_service.dart';
 import 'package:privex/services/database_services.dart';
@@ -95,6 +96,13 @@ class _HomePageState extends State<HomePage> {
                         user.uid!,
                       );
                     }
+                    _navigationServices.push(
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return ChatPage(chatUser: user);
+                        },
+                      ),
+                    );
                   },
                 ),
               );

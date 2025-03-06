@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:privex/pages/home_page.dart';
 import 'package:privex/pages/login_page.dart';
 import 'package:privex/pages/register_page.dart';
@@ -18,6 +19,10 @@ class NavigationalServices {
   // ignore: non_constant_identifier_names
   NavigationalServices() {
     _navigatorKey = GlobalKey<NavigatorState>();
+  }
+
+  void push(MaterialPageRoute route) {
+    _navigatorKey.currentState?.push(route);
   }
 
   void pushNamed(String routeName) {
