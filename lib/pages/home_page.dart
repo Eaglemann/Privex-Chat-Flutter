@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:privex/models/user_profile.dart';
 import 'package:privex/services/alert_services.dart';
 import 'package:privex/services/auth_service.dart';
+import 'package:privex/services/database_services.dart';
 import 'package:privex/services/navigation_services.dart';
+import 'package:privex/widgets/chat_tile.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -17,6 +20,7 @@ class _HomePageState extends State<HomePage> {
   late NavigationalServices _navigationServices;
   late AuthService _authService;
   late AlertServices _alertServices;
+  late DatabaseService _databaseService;
 
   @override
   void initState() {
@@ -24,6 +28,7 @@ class _HomePageState extends State<HomePage> {
     _navigationServices = _getIt.get<NavigationalServices>();
     _authService = _getIt.get<AuthService>();
     _alertServices = _getIt.get<AlertServices>();
+    _databaseService = _getIt.get<DatabaseService>();
   }
 
   @override
@@ -48,6 +53,38 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
+      body: _buildUI(),
+    );
+  }
+
+  Widget _buildUI() {
+    return SafeArea(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+        child: _chatLists(),
+      ),
+    );
+  }
+
+  Widget _chatLists() {
+    return StreamBuilder(
+      stream: _databaseService.getUserPRofiles(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return const Center(child: Text("Unable to load data!"));
+        }
+        if (snapshot.hasData && snapshot.data != null) {
+          final users = snapshot.data!.docs;
+          return ListView.builder(
+            itemCount: users.length,
+            itemBuilder: (context, index) {
+              final UserProfile user = users[index].data();
+              return ChatTile(userProfile: user, onTap: () {});
+            },
+          );
+        }
+        return const Center(child: CircularProgressIndicator());
+      },
     );
   }
 }
