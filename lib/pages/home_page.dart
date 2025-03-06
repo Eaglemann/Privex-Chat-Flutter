@@ -81,7 +81,22 @@ class _HomePageState extends State<HomePage> {
               final UserProfile user = users[index].data();
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 10),
-                child: ChatTile(userProfile: user, onTap: () {}),
+                child: ChatTile(
+                  userProfile: user,
+                  onTap: () async {
+                    final checkExists = await _databaseService.checkChatExists(
+                      _authService.user!.uid,
+                      user.uid!,
+                    );
+
+                    if (!checkExists) {
+                      await _databaseService.createNewChat(
+                        _authService.user!.uid,
+                        user.uid!,
+                      );
+                    }
+                  },
+                ),
               );
             },
           );
