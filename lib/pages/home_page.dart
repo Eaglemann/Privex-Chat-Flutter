@@ -79,7 +79,10 @@ class _HomePageState extends State<HomePage> {
             itemCount: users.length,
             itemBuilder: (context, index) {
               final UserProfile user = users[index].data();
-              return ChatTile(userProfile: user, onTap: () {});
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: ChatTile(userProfile: user, onTap: () {}),
+              );
             },
           );
         }
