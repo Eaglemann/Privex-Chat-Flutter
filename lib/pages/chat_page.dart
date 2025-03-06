@@ -3,6 +3,7 @@ import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:privex/const.dart';
+import 'package:privex/models/chat.dart';
 import 'package:privex/models/message.dart';
 import 'package:privex/models/user_profile.dart';
 import 'package:privex/services/auth_service.dart';
@@ -50,15 +51,25 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Widget _buildUI() {
-    return DashChat(
-      messageOptions: const MessageOptions(
-        showOtherUsersAvatar: true,
-        showTime: true,
-      ),
-      inputOptions: const InputOptions(alwaysShowSend: true),
-      currentUser: currentUser!,
-      onSend: _sendMessage,
-      messages: [],
+    return StreamBuilder(
+      stream: _databaseService.getChatData(currentUser!.id, otherUser!.id),
+      builder: (context, snapshot) {
+        Chat? chat = snapshot.data?.data();
+        List<ChatMessage> messages = [];
+        if (chat != null && chat.messages != null) {
+          messages = _generateChatMessagesList(chat.messages!);
+        }
+        return DashChat(
+          messageOptions: const MessageOptions(
+            showOtherUsersAvatar: true,
+            showTime: true,
+          ),
+          inputOptions: const InputOptions(alwaysShowSend: true),
+          currentUser: currentUser!,
+          onSend: _sendMessage,
+          messages: messages,
+        );
+      },
     );
   }
 
@@ -74,5 +85,20 @@ class _ChatPageState extends State<ChatPage> {
       otherUser!.id,
       message,
     );
+  }
+
+  List<ChatMessage> _generateChatMessagesList(List<Message> messages) {
+    List<ChatMessage> chatMessages =
+        messages.map((e) {
+          return ChatMessage(
+            user: e.senderID == currentUser!.id ? currentUser! : otherUser!,
+            text: e.content!,
+            createdAt: e.sentAt!.toDate(),
+          );
+        }).toList();
+    chatMessages.sort((a, b) {
+      return b.createdAt.compareTo(a.createdAt);
+    });
+    return chatMessages;
   }
 }
